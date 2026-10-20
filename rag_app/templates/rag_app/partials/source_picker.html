@@ -1,0 +1,55 @@
+<div class="source-picker" id="source-picker">
+  <h2 class="panel-heading">Add a source</h2>
+  <p class="panel-note">
+    A browser cannot read your disk directly, so the path below is opened by the Django backend
+    on this computer. Only directories inside the approved roots can be indexed, and nothing in
+    them is ever executed.
+  </p>
+
+  <form id="source-form" class="source-form" novalidate>
+    <div class="field">
+      <label for="kb-name">Name</label>
+      <input class="form-control" type="text" id="kb-name" name="name" maxlength="200"
+             placeholder="My documents" required>
+    </div>
+
+    <div class="field">
+      <span class="field-label">Source type</span>
+      <div class="radio-row">
+        <label class="radio-chip">
+          <input type="radio" name="source_type" value="local_directory" checked>
+          <span>Local folder</span>
+        </label>
+        <label class="radio-chip">
+          <input type="radio" name="source_type" value="github">
+          <span>GitHub repository</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="kb-source" id="kb-source-label">Folder path on this computer</label>
+      <input class="form-control" type="text" id="kb-source" name="source" maxlength="2000"
+             placeholder="/home/you/Documents" required>
+      <p class="field-hint" id="source-hint">
+        Approved roots:
+        {% for root in allowed_source_roots %}<code>{{ root }}</code>{% if not forloop.last %}, {% endif %}{% empty %}<em>none configured</em>{% endfor %}
+      </p>
+    </div>
+
+    <div class="form-error" id="source-form-error" role="alert" hidden></div>
+
+    <div class="form-actions">
+      <button class="primary-button" type="submit" id="source-submit">Index this source</button>
+      <button class="ghost-button" type="button" id="source-cancel">Close</button>
+    </div>
+  </form>
+
+  <details class="format-help">
+    <summary>Supported formats</summary>
+    <p>
+      PDF, Excel (.xlsx), HTML, Word (.docx), plain text, Markdown, CSV and common source code
+      files. Hidden folders, build folders and secret files such as <code>.env</code> are skipped.
+    </p>
+  </details>
+</div>

@@ -1,0 +1,129 @@
+{% extends "rag_app/base.html" %}
+{% load static %}
+
+{% block title %}Personalised RAG{% endblock %}
+
+{% block sidebar %}
+  {% include "rag_app/partials/sidebar.html" %}
+{% endblock %}
+
+{% block content %}
+  <div class="chat-view" id="chat-view"
+       data-empty-state="{% if not ready_knowledge_bases %}true{% else %}false{% endif %}">
+
+    <header class="chat-header">
+      <button class="icon-button sidebar-toggle" id="sidebar-toggle" type="button"
+              aria-label="Toggle the conversation sidebar" aria-expanded="true">☰</button>
+      <div class="chat-header-info">
+        <h1 class="chat-title" id="chat-title">
+          {% if selected_knowledge_base %}
+            {{ selected_knowledge_base.name }}
+          {% else %}
+            Personalised RAG
+          {% endif %}
+        </h1>
+        <p class="chat-subtitle" id="chat-subtitle">
+          {% if selected_knowledge_base %}
+            <span class="kb-status-badge status-{{ selected_knowledge_base.status }}">{{ selected_knowledge_base.get_status_display }}</span>
+            <span class="dot-separator">•</span>
+            <span>{{ selected_knowledge_base.get_source_type_display }}</span>
+            <span class="dot-separator">•</span>
+            <span>top {{ retrieval_k }} chunks</span>
+          {% else %}
+            Add a source to start asking questions about your own documents.
+          {% endif %}
+        </p>
+      </div>
+      <div class="chat-header-actions">
+        <button class="ghost-button" id="open-source-panel" type="button">Sources</button>
+        {% if selected_knowledge_base %}
+          <button class="ghost-button" id="reindex-button" type="button"
+                  data-kb-id="{{ selected_knowledge_base.id }}">Re-index</button>
+        {% endif %}
+      </div>
+    </header>
+
+    <section class="source-panel" id="source-panel" hidden>
+      {% include "rag_app/partials/source_picker.html" %}
+      <div id="ingestion-status-wrapper">
+        {% include "rag_app/partials/ingestion_status.html" %}
+      </div>
+      <div class="kb-list-wrapper">
+        <h2 class="panel-heading">Your knowledge bases</h2>
+        <div id="kb-list" class="kb-list">
+          {% if knowledge_bases %}
+            {% for kb in knowledge_bases %}
+              <div class="kb-card" data-kb-id="{{ kb.id }}">
+                <div class="kb-card-main">
+                  <strong>{{ kb.name }}</strong>
+                  <span class="kb-status-badge status-{{ kb.status }}">{{ kb.get_status_display }}</span>
+                  <p class="kb-card-location" title="{{ kb.display_location }}">{{ kb.display_location }}</p>
+                  <p class="kb-card-meta">
+                    {{ kb.indexed_files.count }} file{{ kb.indexed_files.count|pluralize }}
+                    {% if kb.last_indexed_at %}• updated {{ kb.last_indexed_at|date:"Y-m-d H:i" }}{% endif %}
+                  </p>
+                  {% if kb.last_error %}<p class="kb-card-error">{{ kb.last_error }}</p>{% endif %}
+                </div>
+                <div class="kb-card-actions">
+                  <button class="ghost-button small select-kb" data-kb-id="{{ kb.id }}"
+                          {% if kb.status != 'ready' %}disabled{% endif %}>Use</button>
+                  <button class="ghost-button small danger delete-kb" data-kb-id="{{ kb.id }}"
+                          data-kb-name="{{ kb.name }}">Delete</button>
+                </div>
+              </div>
+            {% endfor %}
+          {% else %}
+            <p class="empty-note">No knowledge bases yet.</p>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+
+    <section class="messages-scroll" id="messages-scroll">
+      <div class="empty-state" id="empty-state">
+        {% if ready_knowledge_bases %}
+          <h2>How can I help you today?</h2>
+          <p class="empty-state-hint">Ask anything about the documents you indexed.</p>
+        {% else %}
+          <h2>Welcome to Personalised RAG</h2>
+          <p class="empty-state-hint">
+            Choose a local folder (or a GitHub repository) to index. Everything stays on this
+            machine except the question and the retrieved passages, which are sent to Groq for
+            the final answer.
+          </p>
+          <button class="primary-button" id="empty-state-add-source" type="button">Add a source</button>
+        {% endif %}
+      </div>
+      <div class="message-list" id="message-list" aria-live="polite"></div>
+    </section>
+
+    <div class="composer-wrap">
+      <div class="composer" id="composer">
+        <textarea id="message-input" class="composer-input" rows="1"
+                  placeholder="Ask a question about your documents…"
+                  aria-label="Your question"></textarea>
+        <button class="send-button" id="send-button" type="button" aria-label="Send message" disabled>
+          <span aria-hidden="true">➤</span>
+        </button>
+      </div>
+      <p class="composer-hint">
+        Answers are generated by <strong>{{ groq_model }}</strong> using passages retrieved from
+        <strong>{{ embedding_model }}</strong> embeddings stored locally in ChromaDB.
+      </p>
+    </div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    window.PERSONALISED_RAG = {
+      apiBase: "/api",
+      retrievalK: {{ retrieval_k }},
+      selectedKnowledgeBaseId: {% if selected_knowledge_base %}"{{ selected_knowledge_base.id }}"{% else %}null{% endif %},
+      readyKnowledgeBaseIds: [{% for kb in ready_knowledge_bases %}"{{ kb.id }}"{% if not forloop.last %}, {% endif %}{% endfor %}],
+      activeConversationId: {% if active_conversation %}"{{ active_conversation.id }}"{% else %}null{% endif %},
+      hasReadyKnowledgeBase: {% if ready_knowledge_bases %}true{% else %}false{% endif %}
+    };
+  </script>
+  <script src="{% static 'rag_app/js/app.js' %}"></script>
+{% endblock %}

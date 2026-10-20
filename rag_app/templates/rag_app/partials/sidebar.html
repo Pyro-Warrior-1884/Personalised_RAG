@@ -1,0 +1,67 @@
+<aside class="sidebar" id="sidebar" aria-label="Conversations">
+  <div class="sidebar-head">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">◧</span>
+      <span class="brand-text">Personalised RAG</span>
+    </div>
+    <button class="icon-button sidebar-close" id="sidebar-close" type="button" aria-label="Close the sidebar">✕</button>
+  </div>
+
+  <div class="sidebar-actions">
+    <button class="primary-button block" id="new-chat-button" type="button">
+      <span aria-hidden="true">＋</span> New chat
+    </button>
+    <button class="ghost-button block" id="sidebar-add-source" type="button">Add a source</button>
+  </div>
+
+  <div class="kb-selector">
+    <label for="kb-select">Knowledge base</label>
+    <select id="kb-select" class="form-control" aria-label="Select a knowledge base">
+      <option value="">Select a knowledge base…</option>
+      {% for kb in ready_knowledge_bases %}
+        <option value="{{ kb.id }}" {% if selected_knowledge_base and kb.id == selected_knowledge_base.id %}selected{% endif %}>
+          {{ kb.name }}
+        </option>
+      {% endfor %}
+    </select>
+    <p class="kb-selector-hint" id="kb-selector-hint">
+      {% if selected_knowledge_base %}
+        {{ selected_knowledge_base.display_location }}
+      {% else %}
+        No knowledge base selected yet.
+      {% endif %}
+    </p>
+  </div>
+
+  <nav class="conversation-list" id="conversation-list" aria-label="Past conversations">
+    <h2 class="list-heading">Recent conversations</h2>
+    <ul id="conversation-items">
+      {% for conversation in conversations %}
+        <li class="conversation-item {% if active_conversation and conversation.id == active_conversation.id %}active{% endif %}"
+            data-conversation-id="{{ conversation.id }}">
+          <button class="conversation-open" type="button" data-conversation-id="{{ conversation.id }}">
+            <span class="conversation-title">{{ conversation.title }}</span>
+            <span class="conversation-meta">{{ conversation.updated_at|date:"Y-m-d H:i" }}</span>
+          </button>
+          <div class="conversation-tools">
+            <button class="icon-button tiny" type="button" data-action="rename"
+                    data-conversation-id="{{ conversation.id }}"
+                    data-title="{{ conversation.title }}" aria-label="Rename conversation">✎</button>
+            <button class="icon-button tiny danger" type="button" data-action="delete"
+                    data-conversation-id="{{ conversation.id }}"
+                    data-title="{{ conversation.title }}" aria-label="Delete conversation">🗑</button>
+          </div>
+        </li>
+      {% empty %}
+        <li class="empty-note">No conversations yet.</li>
+      {% endfor %}
+    </ul>
+  </nav>
+
+  <div class="sidebar-foot">
+    <p class="privacy-note">
+      Embeddings and ChromaDB run locally. Your question and the retrieved passages are sent to
+      Groq to generate the answer.
+    </p>
+  </div>
+</aside>

@@ -1,0 +1,24 @@
+<div class="message {{ message.role }}" data-message-id="{{ message.id }}">
+  <div class="message-body">
+    <div class="message-text" data-raw-text="{{ message.content }}">{{ message.content }}</div>
+    {% if message.sources %}
+      <div class="source-cards">
+        <h4 class="source-cards-title">Sources</h4>
+        <ul>
+          {% for source in message.sources %}
+            <li class="source-card">
+              <span class="source-rank">{{ forloop.counter }}</span>
+              <div class="source-body">
+                <span class="source-label">{{ source.label }}</span>
+                {% if source.excerpt %}<span class="source-excerpt">{{ source.excerpt }}</span>{% endif %}
+                {% if source.score is not None %}
+                  <span class="source-score">score {{ source.score }}</span>
+                {% endif %}
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+  </div>
+</div>

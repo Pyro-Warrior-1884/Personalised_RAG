@@ -1,0 +1,59 @@
+# Secrets and local configuration
+.env
+.env.local
+.env.*.local
+*.env
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Django
+db.sqlite3
+db.sqlite3-journal
+/media/
+/staticfiles/
+*.log
+logs/
+
+# Application data: vectors, cloned repositories and model caches
+data/chroma/
+data/repositories/
+data/*
+!data/.gitkeep
+*.sqlite3
+
+# Model caches
+.cache/
+huggingface/
+hub/
+models/
+
+# Editors and OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Test and coverage artefacts
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.mypy_cache/
+.ruff_cache/

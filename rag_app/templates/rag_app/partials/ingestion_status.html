@@ -1,0 +1,25 @@
+<div class="ingestion-status" id="ingestion-status" data-state="idle" hidden>
+  <div class="ingestion-head">
+    <h3 class="panel-heading" id="ingestion-title">Indexing</h3>
+    <span class="ingestion-stage" id="ingestion-stage">Queued</span>
+  </div>
+
+  <div class="progress-track" role="progressbar" aria-labelledby="ingestion-title"
+       aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="ingestion-progress">
+    <div class="progress-bar" id="ingestion-progress-bar"></div>
+  </div>
+
+  <div class="ingestion-counters" id="ingestion-counters">
+    <div class="counter"><span class="counter-value" id="counter-discovered">0</span><span class="counter-label">discovered</span></div>
+    <div class="counter"><span class="counter-value" id="counter-processed">0</span><span class="counter-label">processed</span></div>
+    <div class="counter"><span class="counter-value" id="counter-skipped">0</span><span class="counter-label">skipped</span></div>
+    <div class="counter"><span class="counter-value" id="counter-failed">0</span><span class="counter-label">failed</span></div>
+    <div class="counter"><span class="counter-value" id="counter-chunks">0</span><span class="counter-label">chunks</span></div>
+  </div>
+
+  <p class="ingestion-error" id="ingestion-error" hidden></p>
+
+  <div class="ingestion-actions">
+    <button class="ghost-button small" id="ingestion-retry" type="button" hidden>Retry indexing</button>
+  </div>
+</div>
