@@ -143,7 +143,7 @@ flowchart TD
     Q[User question] --> E[Embed question locally<br/>same model as indexing]
     E --> R[Similarity search in the<br/>knowledge base's Chroma collection<br/>top-k = 5]
     R --> T{Score above<br/>threshold 0.15?}
-    T -->|No evidence| N[Answer: "not enough<br/>information in the index"]
+    T -->|No evidence| N["Answer: not enough<br/>information in the index"]
     T -->|Evidence found| P[Build grounded prompt:<br/>system rules + EVIDENCE block<br/>+ question]
     P --> G[Send to Groq via ChatGroq]
     G --> A[Return answer +<br/>structured citations]
